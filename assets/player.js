@@ -11,6 +11,39 @@
 	let timer = null;
 	let updatePending = false;
 	let pointerTimer = null;
+	const resumeKey = 'mds-resume:' + window.location.pathname;
+
+	function saveResumePosition(index) {
+		const item = items[index];
+		if (!item) return;
+		const id = item.dataset.itemId || '';
+		const idIsUnique = id && items.filter(function (candidate) { return candidate.dataset.itemId === id; }).length === 1;
+		try {
+			window.sessionStorage.setItem(resumeKey, JSON.stringify({
+				id: idIsUnique ? id : '',
+				index: index,
+				expires: Date.now() + 120000
+			}));
+		} catch (error) {}
+	}
+
+	function getResumePosition() {
+		let saved = null;
+		try {
+			saved = JSON.parse(window.sessionStorage.getItem(resumeKey));
+			window.sessionStorage.removeItem(resumeKey);
+		} catch (error) {
+			return 0;
+		}
+		const expires = saved ? Number.parseInt(saved.expires, 10) : 0;
+		if (!saved || !Number.isInteger(expires) || expires < Date.now() || !items.length) return 0;
+		if (saved.id) {
+			const matchingIndex = items.findIndex(function (item) { return item.dataset.itemId === saved.id; });
+			if (matchingIndex >= 0) return matchingIndex;
+		}
+		const savedIndex = Number.parseInt(saved.index, 10);
+		return Number.isInteger(savedIndex) ? ((savedIndex % items.length) + items.length) % items.length : 0;
+	}
 
 	function clearPlayback() {
 		if (timer) window.clearTimeout(timer);
@@ -27,6 +60,7 @@
 
 	function advance(direction) {
 		if (updatePending) {
+			saveResumePosition((current + direction + items.length) % items.length);
 			window.location.reload();
 			return;
 		}
@@ -96,6 +130,6 @@
 		pointerTimer = window.setTimeout(function () { document.body.classList.remove('is-pointer-visible'); }, 2500);
 	});
 
-	if (items.length) show(0);
+	if (items.length) show(getResumePosition());
 	window.setInterval(pollForUpdates, config.pollInterval);
 }());

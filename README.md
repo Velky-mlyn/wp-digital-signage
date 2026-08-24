@@ -8,9 +8,17 @@ Each published presentation has a dedicated URL at `/display/{slug}/`. Images us
 
 The editor can add one empty item or bulk-select a mixed set of images and videos from the Media Library. Bulk selections are appended in the order returned by the Media Library and remain individually reorderable and configurable.
 
-The player checks for editorial and scheduling changes at a configurable interval. It reloads safely between items, or immediately when the presentation is empty. Invalid media is skipped, and playback loops continuously.
+The player checks for editorial and scheduling changes at a configurable interval. It reloads safely between items and resumes with the intended next item, or reloads immediately when the presentation is empty. Invalid media is skipped, and playback loops continuously.
 
 All media is rendered with `object-fit: contain` against the configured solid background, so it is never cropped.
+
+## Changelog
+
+### 1.1.1
+
+- Generate a unique internal ID for every newly added presentation item.
+- Repair duplicate item IDs safely the next time an existing presentation is saved.
+- Preserve the intended next or previous item across an update-triggered player reload.
 
 ## Windows kiosk mode
 

@@ -216,7 +216,7 @@ final class Plugin {
 				<label><input type="checkbox" name="mds_items[<?php echo esc_attr( $index ); ?>][enabled]" value="1" <?php checked( $item['enabled'] ); ?>> <?php esc_html_e( 'Enabled', 'mlyn-digital-signage' ); ?></label>
 				<button type="button" class="button-link-delete mds-remove-item"><?php esc_html_e( 'Remove', 'mlyn-digital-signage' ); ?></button>
 			</header>
-			<input type="hidden" name="mds_items[<?php echo esc_attr( $index ); ?>][id]" value="<?php echo esc_attr( $item['id'] ); ?>">
+			<input class="mds-item-id" type="hidden" name="mds_items[<?php echo esc_attr( $index ); ?>][id]" value="<?php echo esc_attr( $item['id'] ); ?>">
 			<div class="mds-item-fields">
 				<label><span><?php esc_html_e( 'Media type', 'mlyn-digital-signage' ); ?></span><select class="mds-item-type" name="mds_items[<?php echo esc_attr( $index ); ?>][type]"><option value="image" <?php selected( $item['type'], 'image' ); ?>><?php esc_html_e( 'Image', 'mlyn-digital-signage' ); ?></option><option value="video" <?php selected( $item['type'], 'video' ); ?>><?php esc_html_e( 'Video', 'mlyn-digital-signage' ); ?></option></select></label>
 				<div class="mds-media-field">
@@ -273,12 +273,7 @@ final class Plugin {
 		update_post_meta( $post_id, self::META_SETTINGS, $this->sanitize_settings( $raw_settings ) );
 
 		$raw_items = isset( $_POST['mds_items'] ) && is_array( $_POST['mds_items'] ) ? wp_unslash( $_POST['mds_items'] ) : array();
-		$items     = array();
-		foreach ( $raw_items as $raw_item ) {
-			if ( is_array( $raw_item ) ) {
-				$items[] = $this->sanitize_item( $raw_item );
-			}
-		}
+		$items     = $this->sanitize_items( $raw_items );
 		update_post_meta( $post_id, self::META_ITEMS, $items );
 		update_post_meta( $post_id, self::META_VERSION, wp_generate_uuid4() );
 	}
@@ -443,6 +438,23 @@ final class Plugin {
 			'starts_at' => sanitize_text_field( $item['starts_at'] ?? '' ),
 			'ends_at'   => sanitize_text_field( $item['ends_at'] ?? '' ),
 		);
+	}
+
+	private function sanitize_items( array $raw_items ): array {
+		$items    = array();
+		$seen_ids = array();
+		foreach ( $raw_items as $raw_item ) {
+			if ( ! is_array( $raw_item ) ) {
+				continue;
+			}
+			$item = $this->sanitize_item( $raw_item );
+			if ( isset( $seen_ids[ $item['id'] ] ) ) {
+				$item['id'] = wp_generate_uuid4();
+			}
+			$seen_ids[ $item['id'] ] = true;
+			$items[]                  = $item;
+		}
+		return $items;
 	}
 
 	private function item_defaults(): array {

@@ -7,6 +7,17 @@
 	const template = document.getElementById('mds-item-template');
 	let dragged = null;
 
+	function createItemId() {
+		if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+			return window.crypto.randomUUID();
+		}
+		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (character) {
+			const random = Math.floor(Math.random() * 16);
+			const value = character === 'x' ? random : (random & 0x3) | 0x8;
+			return value.toString(16);
+		});
+	}
+
 	function chooseMedia(options, callback) {
 		const frame = wp.media({
 			title: options.title,
@@ -31,6 +42,7 @@
 		const index = container.querySelectorAll('.mds-item-editor').length;
 		container.insertAdjacentHTML('beforeend', template.innerHTML.replaceAll('__INDEX__', index));
 		const item = container.lastElementChild;
+		item.querySelector('.mds-item-id').value = createItemId();
 		if (!media) return item;
 
 		const type = media.type === 'video' ? 'video' : 'image';
