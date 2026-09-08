@@ -1,7 +1,7 @@
 (function () {
 	'use strict';
 
-	const container = document.getElementById('mds-items');
+	const container = document.getElementById('mds-item-list');
 	const addButton = document.getElementById('mds-add-item');
 	const bulkButton = document.getElementById('mds-add-media-bulk');
 	const template = document.getElementById('mds-item-template');
@@ -157,7 +157,7 @@
 			if (!dragged) return;
 			event.preventDefault();
 			const target = event.target.closest('.mds-item-editor');
-			if (!target || target === dragged) return;
+			if (!target || target === dragged || target.parentElement !== container || dragged.parentElement !== container) return;
 			const box = target.getBoundingClientRect();
 			container.insertBefore(dragged, event.clientY < box.top + box.height / 2 ? target : target.nextSibling);
 		});

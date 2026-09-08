@@ -1,0 +1,42 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Presentation reorder regression</title>
+<!-- WordPress metabox ID must differ from its inner list ID. -->
+<div id="mds-items"><div class="inside"><form id="fixture">
+<div id="mds-item-list" class="mds-items">
+<article class="mds-item-editor" data-key="a" draggable="true"><header>A</header><input name="mds_items[0][id]" value="a"><button type="button" class="mds-move-down">Down</button></article>
+<article class="mds-item-editor" data-key="b" draggable="true"><header>B</header><input name="mds_items[1][id]" value="b"></article>
+<article class="mds-item-editor" data-key="c" draggable="true"><header>C</header><input name="mds_items[2][id]" value="c"><button type="button" class="mds-move-up">Up</button></article>
+</div>
+<button type="button" id="mds-add-item">Add</button>
+<script type="text/html" id="mds-item-template"></script>
+</form></div></div>
+<pre id="result">RUNNING</pre>
+<script>window.testErrors=[];window.addEventListener('error',e=>testErrors.push(e.message));</script>
+<script src="../assets/admin.js"></script>
+<script>
+try {
+ const list=document.querySelector('.mds-items');
+ const order=()=>[...list.children].map(e=>e.dataset.key).join('');
+ const assert=(ok,message)=>{if(!ok)throw Error(message)};
+ function drag(from,to,after) {
+  const source=list.querySelector('[data-key="'+from+'"]');
+  const target=list.querySelector('[data-key="'+to+'"]');
+  const dataTransfer=new DataTransfer();
+  source.querySelector('header').dispatchEvent(new DragEvent('dragstart',{bubbles:true,dataTransfer}));
+  const r=target.getBoundingClientRect();
+  target.querySelector('header').dispatchEvent(new DragEvent('dragover',{bubbles:true,cancelable:true,dataTransfer,clientY:after?r.bottom-1:r.top+1}));
+  source.dispatchEvent(new DragEvent('dragend',{bubbles:true,dataTransfer}));
+ }
+ drag('a','b',true);assert(order()==='bac','Drag down failed');
+ drag('a','b',false);assert(order()==='abc','Drag up failed');
+ drag('a','c',true);assert(order()==='bca','Move to end failed');
+ drag('a','b',false);assert(order()==='abc','Move to start failed');
+ list.querySelector('.mds-move-down').click();assert(order()==='bac','Arrow down failed');
+ list.querySelector('.mds-move-up').click();assert(order()==='bca','Arrow up failed');
+ const fields=[...new FormData(document.getElementById('fixture')).entries()];
+ assert(JSON.stringify(fields)===JSON.stringify([['mds_items[0][id]','b'],['mds_items[1][id]','c'],['mds_items[2][id]','a']]),'Submitted indices do not match the new order');
+ assert(testErrors.length===0,testErrors.join('; '));
+ document.getElementById('result').textContent='PASS: drag up/down, first/last, arrows, and submitted order';
+} catch(e) {document.getElementById('result').textContent='FAIL: '+e.message+' '+testErrors.join('; ')}
+</script>

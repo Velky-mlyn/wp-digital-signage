@@ -186,7 +186,7 @@ final class Plugin {
 		$items = $this->get_items( $post->ID );
 		?>
 		<p><?php esc_html_e( 'Drag items or use the arrow buttons to define playback order. An empty image duration uses the presentation default; an empty video duration uses the video’s natural length.', 'mlyn-digital-signage' ); ?></p>
-		<div id="mds-items" class="mds-items">
+		<div id="mds-item-list" class="mds-items">
 			<?php foreach ( $items as $index => $item ) : ?>
 				<?php $this->render_item_editor( (string) $index, $item ); ?>
 			<?php endforeach; ?>

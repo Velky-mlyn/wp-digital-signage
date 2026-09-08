@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Mlýn Digital Signage
  * Description:       Full-screen image and video presentations managed from WordPress.
- * Version:           1.1.1
+ * Version:           1.1.2
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Velký mlýn
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MDS_VERSION', '1.1.1' );
+define( 'MDS_VERSION', '1.1.2' );
 define( 'MDS_FILE', __FILE__ );
 define( 'MDS_DIR', plugin_dir_path( __FILE__ ) );
 

@@ -14,6 +14,11 @@ All media is rendered with `object-fit: contain` against the configured solid ba
 
 ## Changelog
 
+### 1.1.2
+
+- Fix slide reordering by giving the inner item list an ID distinct from its WordPress metabox.
+- Keep drag insertion targets inside the item list.
+
 ### 1.1.1
 
 - Generate a unique internal ID for every newly added presentation item.
