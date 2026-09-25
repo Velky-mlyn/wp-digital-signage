@@ -1,6 +1,6 @@
 # Mlýn Digital Signage
 
-Full-screen, continuously looping image and video presentations managed in WordPress.
+Full-screen, continuously looping image, video and event presentations managed in WordPress.
 
 ## Playback
 
@@ -12,7 +12,26 @@ The player checks for editorial and scheduling changes at a configurable interva
 
 All media is rendered with `object-fit: contain` against the configured solid background, so it is never cropped.
 
+## Event slides
+
+Choose **Event** as the media type, click **Choose linked event**, and search the modal by title, text or exact numeric ID. Like Flexible Slider, the picker searches as you type (after two characters), shows type/status/date badges and an edit-screen ID link, and offers **Load more** for additional results. Choose **Select** to link the event; **Change linked event** and **Clear linked event** update the selection. The slide follows the event's current generated or ready-made promo banner. If promo banners are disabled, missing or awaiting regeneration, it uses the clean featured image. Without Mlýn Event installed, it also uses the featured image.
+
+A banner change is detected by the normal update polling; the screen reloads between slides. Existing image/video slides retain their media references. To follow an event automatically, select the Event type instead of manually selecting its banner in the Media Library.
+
+Only published, password-free events with a usable image play. Event slides use the existing duration and **Show from / Show until** controls; the event date does not automatically expire a slide. Search results are paginated, including older events.
+
+## Integration verification
+
+`tests/event-integration-smoke.php` uses disposable fixtures to check generated/ready/disabled banners, stale-image fallback, manifest changes, visibility, scheduling, theme cards, clean slider images and real Event Intake re-imports. It requires Mlýn Event, Event Intake, Flexible Slider and the Velký Mlýn theme, and must run in a PHP environment with Imagick image codecs. It cleans up its fixtures by default.
+
 ## Changelog
+
+### 1.2.0
+
+- Add event slides using the current promo banner with featured-image fallback.
+- Detect linked image changes in the playback manifest while retaining stable slide IDs and existing scheduling.
+- Verify organizer re-imports preserve admin banner configuration and schedule regeneration.
+
 
 ### 1.1.2
 
